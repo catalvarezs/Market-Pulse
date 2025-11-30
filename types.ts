@@ -44,10 +44,14 @@ export enum TimeRange {
   LAST_30D = 'last_30d'
 }
 
+export type SearchMode = 'standard' | 'custom';
+
 export interface FilterState {
   country: Country;
   category: Category;
   timeRange: TimeRange;
+  mode: SearchMode;
+  customQuery: string;
 }
 
 // Translations
@@ -65,7 +69,11 @@ export const UI_TEXT: Record<Language, any> = {
     waitingTitle: "Esperando análisis",
     waitingDesc: "Selecciona una región, tema y periodo para generar inteligencia de mercado en tiempo real.",
     error: "No se pudieron obtener los datos del mercado. Por favor intenta de nuevo.",
-    readSource: "Leer fuente original"
+    readSource: "Leer fuente original",
+    tabStandard: "Explorar Mercado",
+    tabCustom: "Objetivo Específico",
+    customPlaceholder: "Ej: Quiero invertir en litio en Chile...",
+    customLabel: "Describe tu objetivo de inversión o interés"
   },
   en: {
     region: "Region",
@@ -80,7 +88,11 @@ export const UI_TEXT: Record<Language, any> = {
     waitingTitle: "Awaiting Analysis",
     waitingDesc: "Select a region, topic, and time range to generate real-time market intelligence.",
     error: "Could not fetch market data. Please try again.",
-    readSource: "Read original source"
+    readSource: "Read original source",
+    tabStandard: "Market Explorer",
+    tabCustom: "Specific Goal",
+    customPlaceholder: "Ex: I want to invest in Lithium in Chile...",
+    customLabel: "Describe your investment goal or interest"
   }
 };
 

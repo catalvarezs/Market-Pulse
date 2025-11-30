@@ -3,15 +3,17 @@ import Header from './components/Header';
 import NewsCard from './components/NewsCard';
 import { NewsCardSkeleton } from './components/Skeleton';
 import { fetchMarketAnalysis } from './services/geminiService';
-import { Country, Category, TimeRange, FilterState, NewsItem, COUNTRY_LABELS, CATEGORY_LABELS, TIME_RANGE_LABELS, Sentiment, Language, UI_TEXT } from './types';
-import { Search, AlertCircle, Activity, ChevronDown } from 'lucide-react';
+import { Country, Category, TimeRange, FilterState, NewsItem, COUNTRY_LABELS, CATEGORY_LABELS, TIME_RANGE_LABELS, Sentiment, Language, UI_TEXT, SearchMode } from './types';
+import { Search, AlertCircle, Activity, ChevronDown, Compass, LayoutGrid } from 'lucide-react';
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('es');
   const [filters, setFilters] = useState<FilterState>({
     country: Country.INT,
     category: Category.BUSINESS,
-    timeRange: TimeRange.LAST_7D
+    timeRange: TimeRange.LAST_7D,
+    mode: 'standard',
+    customQuery: ''
   });
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,13 +27,22 @@ const App: React.FC = () => {
   };
 
   const handleAnalyze = useCallback(async () => {
+    if (filters.mode === 'custom' && !filters.customQuery.trim()) return;
+
     setLoading(true);
     setError(null);
     setNews([]);
     setHasSearched(true);
     
     try {
-      const results = await fetchMarketAnalysis(filters.country, filters.category, filters.timeRange, language);
+      const results = await fetchMarketAnalysis(
+        filters.country, 
+        filters.category, 
+        filters.timeRange, 
+        language,
+        filters.mode,
+        filters.customQuery
+      );
       setNews(results);
     } catch (err) {
       setError(t.error);
@@ -52,6 +63,14 @@ const App: React.FC = () => {
     setFilters(prev => ({ ...prev, timeRange: e.target.value as TimeRange }));
   };
 
+  const handleModeChange = (mode: SearchMode) => {
+    setFilters(prev => ({ ...prev, mode }));
+  };
+
+  const handleCustomQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters(prev => ({ ...prev, customQuery: e.target.value }));
+  };
+
   // Filter lists for display
   const opportunities = news.filter(item => item.sentiment === Sentiment.POSITIVE || item.sentiment === Sentiment.NEUTRAL);
   const risks = news.filter(item => item.sentiment === Sentiment.NEGATIVE);
@@ -69,65 +88,125 @@ const App: React.FC = () => {
         
         {/* Controls Section */}
         <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-8 shadow-sm">
+          
+          {/* Tabs */}
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit mb-5">
+            <button 
+              onClick={() => handleModeChange('standard')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                filters.mode === 'standard' 
+                  ? 'bg-white text-gray-900 shadow-sm' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <LayoutGrid size={16} />
+              {t.tabStandard}
+            </button>
+            <button 
+              onClick={() => handleModeChange('custom')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                filters.mode === 'custom' 
+                  ? 'bg-white text-gray-900 shadow-sm' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Compass size={16} />
+              {t.tabCustom}
+            </button>
+          </div>
+
           <div className="flex flex-col xl:flex-row gap-5 items-end">
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full flex-grow">
-              {/* Country Select */}
-              <div className="w-full">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.region}</label>
-                <div className="relative group">
-                  <select 
-                    value={filters.country}
-                    onChange={handleCountryChange}
-                    className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
-                  >
-                    {Object.entries(COUNTRY_LABELS[language]).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+            {filters.mode === 'standard' ? (
+              /* Standard Filters */
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full flex-grow animate-fade-in">
+                {/* Country Select */}
+                <div className="w-full">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.region}</label>
+                  <div className="relative group">
+                    <select 
+                      value={filters.country}
+                      onChange={handleCountryChange}
+                      className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
+                    >
+                      {Object.entries(COUNTRY_LABELS[language]).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+                  </div>
                 </div>
-              </div>
 
-              {/* Category Select */}
-              <div className="w-full">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.topic}</label>
-                <div className="relative group">
-                  <select 
-                    value={filters.category}
-                    onChange={handleCategoryChange}
-                    className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
-                  >
-                    {Object.entries(CATEGORY_LABELS[language]).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+                {/* Category Select */}
+                <div className="w-full">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.topic}</label>
+                  <div className="relative group">
+                    <select 
+                      value={filters.category}
+                      onChange={handleCategoryChange}
+                      className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
+                    >
+                      {Object.entries(CATEGORY_LABELS[language]).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+                  </div>
                 </div>
-              </div>
 
-              {/* Time Range Select */}
-              <div className="w-full">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.period}</label>
-                <div className="relative group">
-                  <select 
-                    value={filters.timeRange}
-                    onChange={handleTimeRangeChange}
-                    className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
-                  >
-                    {Object.entries(TIME_RANGE_LABELS[language]).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+                {/* Time Range Select */}
+                <div className="w-full">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.period}</label>
+                  <div className="relative group">
+                    <select 
+                      value={filters.timeRange}
+                      onChange={handleTimeRangeChange}
+                      className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
+                    >
+                      {Object.entries(TIME_RANGE_LABELS[language]).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              /* Custom Search Input */
+              <div className="flex flex-col sm:flex-row gap-5 w-full flex-grow animate-fade-in">
+                 <div className="w-full flex-grow">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.customLabel}</label>
+                  <input 
+                    type="text"
+                    value={filters.customQuery}
+                    onChange={handleCustomQueryChange}
+                    placeholder={t.customPlaceholder}
+                    className="w-full bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 px-4 shadow-sm hover:border-gray-300 transition-all placeholder:text-gray-400"
+                  />
+                </div>
+                {/* Keep Time Range for Custom Search too */}
+                <div className="w-full sm:w-1/3 xl:w-1/4">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">{t.period}</label>
+                  <div className="relative group">
+                    <select 
+                      value={filters.timeRange}
+                      onChange={handleTimeRangeChange}
+                      className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
+                    >
+                      {Object.entries(TIME_RANGE_LABELS[language]).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Action Button */}
             <button 
               onClick={handleAnalyze}
-              disabled={loading}
+              disabled={loading || (filters.mode === 'custom' && !filters.customQuery.trim())}
               className="w-full xl:w-auto min-w-[160px] flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white font-medium rounded-xl text-sm px-8 py-3.5 transition-all shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-70 disabled:cursor-not-allowed h-[46px]"
             >
               {loading ? (

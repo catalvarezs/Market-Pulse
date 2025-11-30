@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { NewsItem, Country, Category, Sentiment, TimeRange, Language } from "../types";
+import { NewsItem, Country, Category, Sentiment, TimeRange, Language, SearchMode } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -89,15 +89,41 @@ const getDateContext = (range: TimeRange, lang: Language) => {
   }
 };
 
-export const fetchMarketAnalysis = async (country: Country, category: Category, timeRange: TimeRange, lang: Language): Promise<NewsItem[]> => {
+export const fetchMarketAnalysis = async (
+  country: Country, 
+  category: Category, 
+  timeRange: TimeRange, 
+  lang: Language,
+  mode: SearchMode,
+  customQuery?: string
+): Promise<NewsItem[]> => {
   const countryName = getCountryName(country, lang);
   const { dateStr, strictInstruction } = getDateContext(timeRange, lang);
   const isEn = lang === 'en';
   
-  // Dynamic prompt construction based on language
+  let searchTask = "";
+
+  if (mode === 'custom' && customQuery && customQuery.trim() !== "") {
+    // Custom Mode Prompt Construction
+    searchTask = isEn 
+      ? `The user has a specific investment interest: "${customQuery}".
+         FIRST, infer the best search terms to find news that would positively or negatively affect this goal.
+         THEN, search for the top 8 most important news stories related to those terms published ${dateStr}.
+         Do not restrict yourself to a specific country unless mentioned in the user's query.`
+      : `El usuario tiene un interés de inversión específico: "${customQuery}".
+         PRIMERO, infiere los mejores términos de búsqueda para encontrar noticias que afectarían positiva o negativamente este objetivo.
+         LUEGO, busca las 8 noticias más importantes relacionadas con esos términos publicadas ${dateStr}.
+         No te limites a un país específico a menos que se mencione en la consulta del usuario.`;
+  } else {
+    // Standard Mode Prompt Construction
+    searchTask = isEn 
+      ? `Search for the top 8 most important news stories about "${category}" in ${countryName} published ${dateStr}.`
+      : `Busca las 8 noticias más importantes sobre "${category}" en ${countryName} publicadas ${dateStr}.`;
+  }
+  
   const prompt = isEn 
     ? `
-      Search for the top 8 most important news stories about "${category}" in ${countryName} published ${dateStr}.
+      ${searchTask}
       It is CRUCIAL that the news are ${strictInstruction}. Discard any old news or news outside this range.
       
       Analyze each news item and return ONLY a valid JSON Array. Do not use Markdown.
@@ -105,7 +131,7 @@ export const fetchMarketAnalysis = async (country: Country, category: Category, 
       - "id": a unique string.
       - "title": news title (in English).
       - "source": name of the source.
-      - "summary": concise summary in English (max 15 words).
+      - "summary": concise summary in English (max 15 words) focusing on impact.
       - "sentiment": "positive" (opportunity/growth), "negative" (risk/drop), or "neutral".
       - "risk_score": integer number from 1 (very low risk) to 10 (crisis/high risk).
       - "url": link to the source if available in the context.
@@ -113,7 +139,7 @@ export const fetchMarketAnalysis = async (country: Country, category: Category, 
       Return ONLY the raw JSON Array.
     `
     : `
-      Busca las 8 noticias más importantes sobre "${category}" en ${countryName} publicadas ${dateStr}.
+      ${searchTask}
       Es CRUCIAL que las noticias sean ${strictInstruction}. Descarta cualquier noticia antigua o fuera de este rango.
       
       Analiza cada noticia y genera un array JSON válido. No uses Markdown.
@@ -121,7 +147,7 @@ export const fetchMarketAnalysis = async (country: Country, category: Category, 
       - "id": un string único.
       - "title": título de la noticia (en Español).
       - "source": nombre de la fuente.
-      - "summary": resumen conciso en español (máx 15 palabras).
+      - "summary": resumen conciso en español (máx 15 palabras) enfocado en el impacto.
       - "sentiment": "positive" (oportunidad/crecimiento), "negative" (riesgo/caída), o "neutral".
       - "risk_score": número entero del 1 (muy bajo riesgo) al 10 (crisis/alto riesgo).
       - "url": enlace a la fuente si está disponible en el contexto.
