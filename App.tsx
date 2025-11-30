@@ -4,7 +4,7 @@ import NewsCard from './components/NewsCard';
 import { NewsCardSkeleton } from './components/Skeleton';
 import { fetchMarketAnalysis } from './services/geminiService';
 import { Country, Category, TimeRange, FilterState, NewsItem, COUNTRY_LABELS, CATEGORY_LABELS, TIME_RANGE_LABELS, Sentiment, Language, UI_TEXT, SearchMode } from './types';
-import { Search, AlertCircle, Activity, ChevronDown, Compass, LayoutGrid } from 'lucide-react';
+import { Search, AlertCircle, Activity, ChevronDown, Compass, LayoutGrid, BrainCircuit, Sparkles } from 'lucide-react';
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('es');
@@ -16,6 +16,7 @@ const App: React.FC = () => {
     customQuery: ''
   });
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [analysis, setAnalysis] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
@@ -32,6 +33,7 @@ const App: React.FC = () => {
     setLoading(true);
     setError(null);
     setNews([]);
+    setAnalysis('');
     setHasSearched(true);
     
     try {
@@ -43,7 +45,8 @@ const App: React.FC = () => {
         filters.mode,
         filters.customQuery
       );
-      setNews(results);
+      setNews(results.items);
+      setAnalysis(results.analysis);
     } catch (err) {
       setError(t.error);
     } finally {
@@ -233,6 +236,35 @@ const App: React.FC = () => {
             <AlertCircle size={20} />
             <p className="text-sm font-medium">{error}</p>
           </div>
+        )}
+
+        {/* Expert Analysis Section */}
+        {analysis && !loading && !error && (
+            <div className="mb-10 animate-fade-in">
+                <div className="bg-[#1a1a1a] rounded-2xl p-6 sm:p-8 text-white relative overflow-hidden shadow-lg">
+                    {/* Decorative Background Elements */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
+
+                    <div className="flex items-center gap-2 mb-4 relative z-10">
+                        <BrainCircuit className="text-emerald-400" size={24} />
+                        <h2 className="text-lg sm:text-xl font-semibold tracking-wide text-white">
+                            {t.expertSection}
+                        </h2>
+                    </div>
+
+                    <div className="relative z-10 text-gray-300 leading-relaxed text-sm sm:text-base space-y-4 font-light">
+                        {analysis.split('\n').map((paragraph, idx) => (
+                            paragraph.trim() && <p key={idx}>{paragraph}</p>
+                        ))}
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-gray-500 relative z-10">
+                        <Sparkles size={12} />
+                        {t.expertDisclaimer}
+                    </div>
+                </div>
+            </div>
         )}
 
         {/* Results Grid */}

@@ -17,6 +17,11 @@ export interface NewsItem {
   published_at?: string;
 }
 
+export interface MarketResponse {
+  analysis: string;
+  items: NewsItem[];
+}
+
 export enum Country {
   INT = 'int',
   MX = 'mx',
@@ -73,7 +78,9 @@ export const UI_TEXT: Record<Language, any> = {
     tabStandard: "Explorar Mercado",
     tabCustom: "Objetivo Específico",
     customPlaceholder: "Ej: Quiero invertir en litio en Chile...",
-    customLabel: "Describe tu objetivo de inversión o interés"
+    customLabel: "Describe tu objetivo de inversión o interés",
+    expertSection: "Análisis Estratégico & Contexto",
+    expertDisclaimer: "Generado por IA basado en datos actuales e históricos."
   },
   en: {
     region: "Region",
@@ -92,7 +99,9 @@ export const UI_TEXT: Record<Language, any> = {
     tabStandard: "Market Explorer",
     tabCustom: "Specific Goal",
     customPlaceholder: "Ex: I want to invest in Lithium in Chile...",
-    customLabel: "Describe your investment goal or interest"
+    customLabel: "Describe your investment goal or interest",
+    expertSection: "Strategic Analysis & Context",
+    expertDisclaimer: "AI-generated based on current and historical data."
   }
 };
 
