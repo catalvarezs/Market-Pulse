@@ -58,7 +58,12 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-slate-900 pb-10 flex flex-col">
-      <Header language={language} onToggleLanguage={handleToggleLanguage} />
+      {/* Pass loading state to Header for animation */}
+      <Header 
+        language={language} 
+        onToggleLanguage={handleToggleLanguage} 
+        loading={loading}
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
         
