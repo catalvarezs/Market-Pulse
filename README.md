@@ -9,12 +9,12 @@
 
 ---
 
-## 🚀 Características Principales
+## Características Principales
 
 -   **Análisis en Tiempo Real (Live Grounding):** No utiliza bases de datos de noticias antiguas. Conecta directamente con el índice de búsqueda de Google a través de Gemini para obtener la información más reciente (hasta los últimos minutos).
 -   **Clasificación Inteligente:** Separa automáticamente las noticias en dos columnas claras:
-    -   🟢 **Oportunidades:** Noticias con sentimiento positivo o neutral.
-    -   🔴 **Riesgos:** Noticias con sentimiento negativo o alertas de crisis.
+    -   **Oportunidades:** Noticias con sentimiento positivo o neutral.
+    -   **Riesgos:** Noticias con sentimiento negativo o alertas de crisis.
 -   **Risk Scoring:** Asigna un puntaje de riesgo (1-10) a cada titular basándose en la gravedad del evento.
 -   **Filtros Avanzados:**
     -   **Región:** Global, México, Estados Unidos, España, Argentina, Chile.
@@ -24,7 +24,7 @@
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack
 
 -   **Frontend:** React 19, Tailwind CSS.
 -   **Lenguaje:** TypeScript.
@@ -34,12 +34,12 @@
 
 ---
 
-## 📋 Prerrequisitos
+## Prerrequisitos
 
 Necesitas una API Key de Google Gemini (AI Studio).
 **Nota:** Este proyecto utiliza la funcionalidad de "Search Grounding", por lo que no requiere una API Key de servicios de noticias externos.
 
-## 🔧 Instalación y Configuración
+## Instalación y Configuración
 
 Sigue estos pasos para ejecutar el proyecto localmente:
 
@@ -86,25 +86,7 @@ El sistema sigue un flujo optimizado para velocidad y precisión:
 
 ---
 
-## 📂 Estructura del Proyecto
+## Licencia
 
-```bash
-/
-├── components/
-│   ├── Header.tsx       # Barra de navegación
-│   ├── NewsCard.tsx     # Tarjeta individual de noticia
-│   └── Skeleton.tsx     # Estado de carga
-├── services/
-│   └── geminiService.ts # Lógica de conexión con AI y Prompting
-├── types.ts             # Definiciones de TypeScript (Enums, Interfaces)
-├── App.tsx              # Componente principal y gestión de estado
-├── index.tsx            # Punto de entrada
-└── index.html           # Documento base
-```
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Siéntete libre de usarlo, modificarlo y distribuirlo.
+Este proyecto está bajo la Licencia MIT.
 
