@@ -1,7 +1,13 @@
 import React from 'react';
 import { Activity } from 'lucide-react';
+import { Language } from '../types';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  language: Language;
+  onToggleLanguage: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ language, onToggleLanguage }) => {
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -11,9 +17,15 @@ const Header: React.FC = () => {
           </div>
           <span className="text-lg font-semibold tracking-tight text-gray-900">MarketPulse</span>
         </div>
-        <div className="hidden sm:block text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Intelligence v1.0
-        </div>
+        
+        <button 
+          onClick={onToggleLanguage}
+          className="text-xs font-semibold tracking-wider px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors text-gray-600"
+        >
+          <span className={language === 'es' ? 'text-black' : 'text-gray-400'}>ES</span>
+          <span className="mx-1 text-gray-300">|</span>
+          <span className={language === 'en' ? 'text-black' : 'text-gray-400'}>EN</span>
+        </button>
       </div>
     </header>
   );

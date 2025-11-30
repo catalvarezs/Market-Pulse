@@ -29,7 +29,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
         </div>
         
         {/* Risk Score Indicator */}
-        <div className="flex items-center gap-1" title="Puntaje de Riesgo (1-10)">
+        <div className="flex items-center gap-1" title="Risk Score / Puntaje de Riesgo (1-10)">
             <AlertTriangle size={12} className={item.risk_score > 6 ? 'text-orange-500' : 'text-gray-300'} />
             <span className={`text-xs font-bold ${
                 item.risk_score > 7 ? 'text-rose-600' : 
@@ -55,7 +55,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
           rel="noopener noreferrer"
           className="inline-flex items-center text-xs font-medium text-gray-400 hover:text-gray-900 transition-colors mt-auto"
         >
-          Leer fuente original <ExternalLink size={10} className="ml-1" />
+          <ExternalLink size={10} className="mr-1" /> Source
         </a>
       )}
     </div>
