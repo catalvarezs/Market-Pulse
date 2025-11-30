@@ -14,6 +14,7 @@ const getCountryName = (code: Country): string => {
     case Country.US: return "Estados Unidos";
     case Country.ES: return "España";
     case Country.AR: return "Argentina";
+    case Country.CL: return "Chile";
     case Country.INT: return "el mundo (enfoque internacional)";
     default: return "el mundo";
   }
@@ -22,9 +23,17 @@ const getCountryName = (code: Country): string => {
 export const fetchMarketAnalysis = async (country: Country, category: Category): Promise<NewsItem[]> => {
   const countryName = getCountryName(country);
   
+  // Calculate date range for the last 7 days to ensure weekly context
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+  const formatDate = (d: Date) => d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  const dateRange = `entre el ${formatDate(sevenDaysAgo)} y el ${formatDate(today)}`;
+  
   // Prompt engineered for batch processing and structured JSON output using Google Search Grounding
   const prompt = `
-    Busca las 8 noticias más importantes y recientes sobre "${category}" en ${countryName} hoy.
+    Busca las 8 noticias más importantes sobre "${category}" en ${countryName} publicadas ${dateRange}.
+    Es CRUCIAL que las noticias sean EXCLUSIVAMENTE de esta semana (${dateRange}). Descarta cualquier noticia antigua o fuera de este rango.
     
     Analiza cada noticia y genera un array JSON válido. No uses Markdown.
     Cada objeto debe tener:

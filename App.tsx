@@ -4,7 +4,7 @@ import NewsCard from './components/NewsCard';
 import { NewsCardSkeleton } from './components/Skeleton';
 import { fetchMarketAnalysis } from './services/geminiService';
 import { Country, Category, FilterState, NewsItem, COUNTRY_LABELS, CATEGORY_LABELS, Sentiment } from './types';
-import { Search, Filter, AlertCircle, Activity } from 'lucide-react';
+import { Search, AlertCircle, Activity, ChevronDown } from 'lucide-react';
 
 const App: React.FC = () => {
   const [filters, setFilters] = useState<FilterState>({
@@ -51,41 +51,41 @@ const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Controls Section */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-8 shadow-sm">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-8 shadow-sm">
+          <div className="flex flex-col md:flex-row gap-5 items-end">
             
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <div className="flex flex-col sm:flex-row gap-5 w-full md:w-auto flex-grow">
               {/* Country Select */}
-              <div className="relative min-w-[200px]">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block pl-1">Región</label>
-                <div className="relative">
+              <div className="w-full sm:w-1/2 md:w-64">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">Región</label>
+                <div className="relative group">
                   <select 
                     value={filters.country}
                     onChange={handleCountryChange}
-                    className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block p-2.5 pr-8 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
                   >
                     {Object.entries(COUNTRY_LABELS).map(([key, label]) => (
                       <option key={key} value={key}>{label}</option>
                     ))}
                   </select>
-                  <Filter size={14} className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
                 </div>
               </div>
 
               {/* Category Select */}
-              <div className="relative min-w-[200px]">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block pl-1">Tema</label>
-                <div className="relative">
+              <div className="w-full sm:w-1/2 md:w-64">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block pl-1">Tema</label>
+                <div className="relative group">
                   <select 
                     value={filters.category}
                     onChange={handleCategoryChange}
-                    className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block p-2.5 pr-8 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="w-full appearance-none bg-white border border-gray-200 text-gray-900 text-sm font-medium rounded-xl focus:ring-2 focus:ring-black focus:border-transparent block py-3 pl-4 pr-10 cursor-pointer shadow-sm hover:border-gray-300 transition-all"
                   >
                     {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
                       <option key={key} value={key}>{label}</option>
                     ))}
                   </select>
-                  <Filter size={14} className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
                 </div>
               </div>
             </div>
@@ -94,7 +94,7 @@ const App: React.FC = () => {
             <button 
               onClick={handleAnalyze}
               disabled={loading}
-              className="w-full md:w-auto mt-4 md:mt-0 flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white font-medium rounded-lg text-sm px-6 py-3 transition-all focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full md:w-auto flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white font-medium rounded-xl text-sm px-8 py-3.5 transition-all shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-70 disabled:cursor-not-allowed h-[46px]"
             >
               {loading ? (
                 <>
@@ -106,8 +106,8 @@ const App: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Search size={16} />
-                  Analizar Mercado
+                  <Search size={18} />
+                  Analizar
                 </>
               )}
             </button>
